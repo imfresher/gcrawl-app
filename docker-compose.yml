@@ -1,0 +1,53 @@
+version: '3'
+
+services:
+  app:
+    image: amazonlinux:2023
+    tty: true
+    restart: always
+    privileged: true
+    volumes:
+      - ./:/var/www/app
+    working_dir: /var/www/app
+    ports:
+      - "3000:3000"
+    links:
+      - db
+    environment:
+      XDEBUG_MODE: develop,debug
+      XDEBUG_CONFIG: "client_host=host.docker.internal client_port=9000 idekey=VSCODE"
+    extra_hosts:
+      - "github.com:192.30.255.113"
+      - "assets-cdn.github.com:151.101.0.133"
+      - "avatars2.githubusercontent.com:151.101.64.133"
+      - "avatars1.githubusercontent.com:151.101.64.133"
+      - "avatars0.githubusercontent.com:151.101.64.133"
+      - "collector.githubapp.com:52.73.244.200"
+      - "api.github.com:192.30.255.117"
+      - "help.github.com:185.199.109.153"
+      - "codeload.github.com:192.30.255.120"
+      - "gist.github.com:192.30.255.118"
+  db:
+    image: mysql:5.7
+    volumes:
+      - ./.docker/mysql:/var/lib/mysql
+      - ./.docker/data:/var/data
+      - ./.docker/mysql-files:/var/lib/mysql-files/
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_DATABASE: gcrawldb
+      MYSQL_ROOT_PASSWORD: root
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    ports:
+      - "8080:80"
+    depends_on:
+      - db
+    environment:
+      PMA_HOST: db
+      PMA_PORT: 3306
+      PMA_USER: root
+      PMA_PASSWORD: root
+      PMA_USER_CONFIG_BASE64: PD9waHAKJGNmZ1snTG9naW5Db29raWVWYWxpZGl0eSddID0gODY0MDA7
+
